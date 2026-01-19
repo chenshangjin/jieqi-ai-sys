@@ -45,7 +45,7 @@ conda activate jieqi
 pip install pygame
 ```
 
-**说明**：项目使用Pygame用于GUI展示，readline模块不需要（已注释）。
+**说明**：项目使用Pygame用于GUI展示，readline模块已优化为跨平台兼容（Unix系统正常导入，Windows系统自动跳过）。
 
 ### C++ 环境（可选）
 
@@ -61,25 +61,37 @@ pip install pygame
 jieqi-ai-sys/
 ├── README.md                          # 项目文档
 ├── LICENSE.md                         # GPLv3 协议
-├── gui.py                             # Windows GUI界面
-├── board/                             # 棋盘核心模块
-│   ├── board.py                       # 棋盘数据结构 (1345行)
-│   ├── common.py                      # 棋力评估表和函数
-│   ├── library.py                     # 开局库数据
-│   └── ALL_ZERO_TUPLE.txt             # 初始棋局配置
-├── musesfish_pvs_v2_fixed.py         # ✅ 推荐：最新AI主程序
-├── musesfish_pvs.py                  # 旧版AI实现
-├── musesfish_mtd_*.py                # MTD搜索算法版本
-├── musesfish_pvs_v1_fixed.py         # 历史版本
-└── cppjieqi/                         # C++高性能版本
-    ├── cppjieqi2/                    # 第二代实现
-    ├── CMakeLists.txt
-    ├── main.cpp
-    ├── board/                        # 棋盘实现 (AIBoard3/4/5)
-    ├── global/                       # 全局配置
-    ├── score/                        # 棋力评估引擎
-    ├── players.conf                  # 玩家配置文件
-    └── score.conf                    # 评估参数配置
+├── CHANGELOG.md                       # 版本日志
+├── CONTRIBUTING.md                    # 贡献指南
+├── requirements.txt                   # Python依赖
+├── setup.py                           # Python包配置
+├── src/                               # 源代码目录
+│   ├── ai/
+│   │   └── engine.py                  # ✅ 推荐：最新AI主程序 (跨平台兼容)
+│   ├── gui/
+│   │   └── main.py                    # Windows GUI界面
+│   └── board/                        # 棋盘核心模块
+│       ├── board.py                   # 棋盘数据结构 (1345行)
+│       ├── common_v2_fixed.py         # 棋力评估表和函数
+│       ├── library.py                 # 开局库数据
+│       └── ALL_ZERO_TUPLE.txt         # 初始棋局配置
+├── cpp/                               # C++高性能版本
+│   ├── src/
+│   │   ├── CMakeLists.txt
+│   │   ├── main.cpp
+│   │   ├── board/                     # 棋盘实现 (AIBoard3/4/5)
+│   │   ├── global/                    # 全局配置
+│   │   └── score/                     # 棋力评估引擎
+│   └── config/                        # 配置文件
+│       ├── players.conf               # 玩家配置文件
+│       └── score.conf                 # 评估参数配置
+├── archive/                           # 历史版本归档
+│   ├── musesfish_pvs.py              # 旧版AI实现
+│   ├── musesfish_mtd_*.py            # MTD搜索算法版本
+│   └── musesfish_pvs_v1_fixed.py    # v1修复版
+├── tests/                             # 单元测试目录
+├── docs/                              # 文档目录
+└── scripts/                           # 辅助脚本
 ```
 
 ---
@@ -90,7 +102,7 @@ jieqi-ai-sys/
 
 ```bash
 conda activate jieqi
-python musesfish_pvs_v2_fixed.py
+python src/ai/engine.py
 ```
 
 ### 使用方法
@@ -184,10 +196,11 @@ Searcher()
 
 | 文件 | 说明 | 状态 |
 |------|------|------|
-| musesfish_pvs_v2_fixed.py | 最新稳定版，修复多项BUG | ✅ 推荐 |
-| musesfish_pvs.py | 原始版本 | 已过时 |
-| musesfish_pvs_v1_fixed.py | v1修复版 | ⚠️ 旧版 |
-| musesfish_mtd_*.py | 基于MTD搜索的版本 | 实验性 |
+| src/ai/engine.py | 最新稳定版，v2.0.1实现跨平台兼容 | ✅ 推荐 |
+| archive/musesfish_pvs_v2_fixed.py | v2.0.0版本 (已归档) | 旧版 |
+| archive/musesfish_pvs.py | 原始版本 | 已过时 |
+| archive/musesfish_pvs_v1_fixed.py | v1修复版 | ⚠️ 旧版 |
+| archive/musesfish_mtd_*.py | 基于MTD搜索的版本 | 实验性 |
 
 ---
 
@@ -197,7 +210,7 @@ Searcher()
 
 ```bash
 pip install pygame
-python gui.py
+python src/gui/main.py
 ```
 
 ### 功能说明
@@ -211,13 +224,15 @@ python gui.py
 
 #### ❌ 问题1：readline模块导入失败
 
-**症状**：`ImportError: No module named readline`
+**症状**：`ImportError: No module named readline`（旧版本）
 
-**根本原因**：readline模块在Windows上需要特殊安装，且项目实际未使用
+**根本原因**：readline模块仅适用于Unix系统，Windows不支持
 
 **解决方案**：
-- ✅ 在 `musesfish_pvs_v2_fixed.py` 中注释掉 `import readline` 一行
-- 该模块不是必需的
+- ✅ 已在 `src/ai/engine.py` 中实现跨平台兼容（v2.0.1+）
+- 使用 try-except 条件导入:
+  - Unix/Linux: 正常导入 readline
+  - Windows: 自动跳过该模块
 
 #### ❌ 问题2：程序下两步后卡住
 
@@ -397,7 +412,7 @@ game.log       # 对局日志文件(用@前缀表示清空)
 
 ```bash
 # 测试AI搜索正确性
-python -c "from musesfish_pvs_v2_fixed import main; main()"
+python -c "from src.ai.engine import main; main()"
 ```
 
 ### 调试技巧
@@ -418,7 +433,7 @@ print(f"Elapsed: {time.time() - start:.2f}s")
 
 **棋局可视化**：
 ```python
-from musesfish_pvs_v2_fixed import print_pos
+from src.ai.engine import print_pos
 print_pos(position)  # 打印当前棋局
 ```
 

@@ -3,14 +3,23 @@
 
 #Updated by Si Miao 2021/05/20
 from __future__ import print_function
-import re, sys, time
+import re, sys, time, os
 from itertools import count
 from collections import namedtuple
 import random
+
+# 添加src目录到Python路径
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from board import board
 from board import common_v2_fixed as common
 from copy import deepcopy
-import readline
+
+# readline仅在Unix系统可用，Windows不需要
+try:
+    import readline
+except ImportError:
+    pass
 
 B = board.Board()
 piece = {'P': 44, 'N': 108, 'B': 23, 'R': 233, 'A': 23, 'C': 101, 'K': 2500}

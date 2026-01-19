@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import os
 from subprocess import PIPE
 from threading import Thread
 from queue import Queue
@@ -7,22 +8,26 @@ from collections import namedtuple
 
 import pygame
 import pygame.freetype
-import sys
 from pygame.locals import QUIT, KEYDOWN, MOUSEBUTTONDOWN, MOUSEBUTTONUP
 
 RED_CHESS_COLOR = [255, 255, 255]
 BLACK_CHESS_COLOR = [0, 0, 0]
 CHESS_NAMES = {'车', '马', '炮', '象', '士', '兵', '帅',
                '俥', '傌', '相', '仕', '卒', '将', '暗'}
+
+# 获取项目根目录
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 if sys.platform == 'linux':
     font_path = '/usr/share/fonts/truetype/arphic/ukai.ttc'
 else:
     font_path = 'C:/Windows/Fonts/simkai.ttf'
 
+# 使用项目中的AI引擎
+engine_path = os.path.join(PROJECT_ROOT, 'src', 'ai', 'engine.py')
 play_process = subprocess.Popen(
-    ['python',
-     'C:\\Users\\anpro\\Desktop\\Jieqi-main\\musesfish_pvs_20210815.py'],
-    stdin=PIPE, stdout=PIPE)
+    ['python', engine_path],
+    stdin=PIPE, stdout=PIPE, cwd=PROJECT_ROOT)
 
 
 class ChessInfo:
@@ -92,47 +97,58 @@ class Board:
     def draw(self):
 
         while 1:
-            line = self.stdout.get().decode().strip()
-            print(line)
+            try:
+                raw_data = self.stdout.get()
+                # 尝试不同的编码方式
+                try:
+                    line = raw_data.decode('utf-8').strip()
+                except UnicodeDecodeError:
+                    # 如果UTF-8失败，尝试GBK (中文编码)
+                    line = raw_data.decode('gbk', errors='ignore').strip()
+                
+                print(line)
 
-            if line == '电脑吃子:':
-                self.screen.fill(self.screen_color)
-                self.draw_board()
-                self.chesses = []
-                self.empty_chess_rects = []
-                self.current_select_chess = None
+                if line == '电脑吃子:' or line == '':
+                    self.screen.fill(self.screen_color)
+                    self.draw_board()
+                    self.chesses = []
+                    self.empty_chess_rects = []
+                    self.current_select_chess = None
 
-            if not line or line[0] not in {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}:
-                continue
+                if not line or line[0] not in {
+                    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}:
+                    continue
 
-            chess_color = RED_CHESS_COLOR if '\033[31m' in line else BLACK_CHESS_COLOR
-            row = 10 - int(line[0])
-            col = 1
-            for name in line:
-                if name == '．':
-                    center, radius = self.get_chess_pos(row, col)
-                    self.empty_chess_rects.append(
-                        ChessInfo(
-                            pygame.Rect(center[0] - radius,
-                                        center[1] - radius,
-                                        radius * 2,
-                                        radius * 2),
-                            None,
-                            f'{chr(col + 96)}{line[0]}'))
+                chess_color = RED_CHESS_COLOR if '\033[31m' in line else BLACK_CHESS_COLOR
+                row = 10 - int(line[0])
+                col = 1
+                for name in line:
+                    if name == '．':
+                        center, radius = self.get_chess_pos(row, col)
+                        self.empty_chess_rects.append(
+                            ChessInfo(
+                                pygame.Rect(center[0] - radius,
+                                            center[1] - radius,
+                                            radius * 2,
+                                            radius * 2),
+                                None,
+                                f'{chr(col + 96)}{line[0]}'))
+                        col += 1
+                        continue
+
+                    if name not in CHESS_NAMES:
+                        continue
+
+                    params = row, col, chess_color, name
+                    chess_rect = self.draw_a_chess(*params)
+                    self.chesses.append(
+                        ChessInfo(chess_rect, params, f'{chr(col + 96)}{line[0]}'))
                     col += 1
-                    continue
 
-                if name not in CHESS_NAMES:
-                    continue
-
-                params = row, col, chess_color, name
-                chess_rect = self.draw_a_chess(*params)
-                self.chesses.append(
-                    ChessInfo(chess_rect, params, f'{chr(col + 96)}{line[0]}'))
-                col += 1
-
-            pygame.display.update()
+                pygame.display.update()
+            except Exception as e:
+                print(f"Error in draw: {e}")
+                continue
 
     def select(self, chess):
         params = list(chess.draw_metadata)
