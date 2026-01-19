@@ -3,7 +3,7 @@ GNU GENERAL PUBLIC LICENSE
 
 Version 3, 21 October 2021
 
-Copyright &copy; 2021 SI MIAO. 
+Copyright &copy; 2024 chenshangjin. 
 
 Everyone is permitted to copy and distribute verbatim copies of this license
 document, but changing it is not allowed.
