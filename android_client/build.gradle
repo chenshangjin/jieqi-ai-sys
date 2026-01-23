@@ -13,14 +13,6 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        jcenter() // Warning: this repository is deprecated
-    }
-}
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
