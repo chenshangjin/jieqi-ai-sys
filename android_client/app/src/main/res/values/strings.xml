@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">揭棋AI识别器</string>
+    <string name="capture_screen">截取棋盘</string>
+    <string name="process_board">识别棋盘</string>
+    <string name="get_recommendation">获取AI推荐</string>
+    <string name="board_recognition_result">棋盘识别结果</string>
+    <string name="ai_recommendation">AI推荐着法</string>
+    <string name="connect_server">连接AI服务器</string>
+    <string name="status_idle">待命</string>
+    <string name="status_processing">处理中...</string>
+    <string name="status_success">识别成功</string>
+    <string name="status_error">识别失败</string>
+</resources>

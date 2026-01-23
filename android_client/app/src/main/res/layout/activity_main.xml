@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <ImageView
+        android:id="@+id/boardPreview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="#EEEEEE"
+        android:scaleType="fitCenter"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="棋盘预览" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/status_idle"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginBottom="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/captureButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/capture_screen"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/processButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/process_board"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/recommendationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/get_recommendation"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:id="@+id/resultText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="14sp"
+        android:minLines="3"
+        android:background="#F5F5F5"
+        android:padding="8dp" />
+
+</LinearLayout>
